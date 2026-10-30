@@ -27,7 +27,7 @@ export async function createApp(options:{repoRoot:string;dataRoot:string;port?:n
  const agents=new Agents(store,scenarios,runtime,workspace,()=>origin),submissions=new Submissions(store,workspace,runtime,attempts,agents),validation=new Validation(store,workspace,submissions,attempts,scenarios),evaluation=new Evaluation(store,runtime,scenarios,submissions,validation,attempts,repoRoot);
  const scenarioDrafts=new ScenarioDrafts(scenarios,runtime);
  const imports=new Imports(store,()=>runtime.close());
- workspace.isCoderBusy=id=>runtime.isCoderBusy(id);await workspace.recoverOwnedProcesses();attempts.recover();attempts.runClock();
+ workspace.codexBinary=()=>runtime.resolvedBinary();workspace.isCoderBusy=id=>runtime.isCoderBusy(id);await workspace.recoverOwnedProcesses();attempts.recover();attempts.runClock();
  const app=express(),server=http.createServer(app),wss=new WebSocketServer({noServer:true});
  const tokens=new Set<string>(),sessions=new Map<string,string>(),tickets=new Map<string,any>(),streams=new Set<any>();
  const sessionCookie=()=> 'wpl_session_'+new URL(origin).port;
