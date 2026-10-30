@@ -1,0 +1,2 @@
+import fs from 'node:fs';
+const file='tasks/tasks.json';if(!fs.existsSync(file))throw new Error('구현 원장이 없습니다.');const ledger=JSON.parse(fs.readFileSync(file,'utf8')),counts:Record<string,number>={};for(const t of ledger.tasks){counts[t.status]=(counts[t.status]||0)+1;for(const p of t.evidence||[])if(!fs.existsSync(p))throw new Error(t.id+'의 증거 파일이 없습니다: '+p);}console.log(JSON.stringify({total:ledger.tasks.length,status:counts,updatedAt:ledger.updatedAt},null,2));for(const t of ledger.tasks.filter((t:any)=>t.status!=='completed'))console.log(t.id+' '+t.status+' '+t.title);

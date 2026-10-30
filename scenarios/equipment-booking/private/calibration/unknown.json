@@ -1,0 +1,108 @@
+{
+  "kind": "unknown",
+  "synthetic": true,
+  "rubricVersion": "0.2.0",
+  "scenarioId": "equipment-booking",
+  "description": "표준 수행 기회·사후 질문 이후의 가상 평가 사례. 시스템 누락 없음. 실제 앱 실행 증거가 아님.",
+  "inputEvidence": [
+    {
+      "id": "inventory",
+      "source": "system",
+      "kind": "condition",
+      "content": "표준 수행 기회와 5개 사후 질문을 제공하고 기록 수집을 완료했다. 기록에 없는 능력에 대해서는 응답하지 않음으로 확정했다. 이 목록은 실행 성공 또는 이해를 증명하지 않는다."
+    }
+  ],
+  "expected": {
+    "TEC-1": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "TEC-2": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "TEC-3": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "TEC-4": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "INT-1": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "INT-2": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "INT-3": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "INT-4": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "COG-1": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "COG-2": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "COG-3": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    },
+    "COG-4": {
+      "status": "rated",
+      "ratingRange": [
+        0,
+        0
+      ]
+    }
+  },
+  "checks": [
+    "최종 12개 항목은 모두 0~4점이다.",
+    "표준 기회 이후 입증하지 못한 항목은 0점이다.",
+    "AI의 주장과 실제 관찰, 사용자의 직접 설명을 구분한다.",
+    "시스템 누락·환경 오류는 성적이 아니라 채점 전 복구 대상이다."
+  ],
+  "scoringPolicyVersion": "1.0.0"
+}

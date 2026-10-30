@@ -1,0 +1,120 @@
+{
+  "persona": {
+    "name": "서윤",
+    "job": "교육 담당자",
+    "tone": "친절하지만 필요한 업무 사실만 설명한다."
+  },
+  "topics": [
+    {
+      "id": "problem",
+      "label": "problem",
+      "description": "신입 직원이 고객의 사용 장소나 불편을 묻지 않고 인기 제품부터 권하는 경우가 많습니다."
+    },
+    {
+      "id": "goal",
+      "label": "goal",
+      "description": "고객의 필요를 질문으로 확인하고, 들은 답과 추천 이유를 연결하는 것이 가장 중요합니다."
+    },
+    {
+      "id": "coaching",
+      "label": "coaching",
+      "description": "좋았던 표현 하나와 바꿔볼 표현 하나를 짚고 같은 상황에서 다시 말하게 합니다."
+    },
+    {
+      "id": "context",
+      "label": "context",
+      "description": "근무 전 휴대폰으로 5분 정도 혼자 연습합니다. 매장에서 소리 내기 어려워 텍스트도 괜찮습니다."
+    },
+    {
+      "id": "scope",
+      "label": "scope",
+      "description": "처음에는 가습기 추천 상황 하나면 충분합니다. 음성이나 관리자 통계는 지금 필요하지 않습니다."
+    },
+    {
+      "id": "scoring",
+      "label": "scoring",
+      "description": "직원 점수나 순위는 원하지 않습니다. 다음에 무엇을 바꿀지 아는 게 중요합니다."
+    },
+    {
+      "id": "truth",
+      "label": "truth",
+      "description": "상품 자료에 없는 성능·효과를 추측해서 안내하면 안 됩니다. 확인이 필요하다고 말해야 합니다."
+    }
+  ],
+  "facts": [
+    {
+      "id": "retail-coaching-problem",
+      "topicIds": [
+        "problem"
+      ],
+      "statement": "신입 직원이 고객의 사용 장소나 불편을 묻지 않고 인기 제품부터 권하는 경우가 많습니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-goal",
+      "topicIds": [
+        "goal"
+      ],
+      "statement": "고객의 필요를 질문으로 확인하고, 들은 답과 추천 이유를 연결하는 것이 가장 중요합니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-coaching",
+      "topicIds": [
+        "coaching"
+      ],
+      "statement": "좋았던 표현 하나와 바꿔볼 표현 하나를 짚고 같은 상황에서 다시 말하게 합니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-context",
+      "topicIds": [
+        "context"
+      ],
+      "statement": "근무 전 휴대폰으로 5분 정도 혼자 연습합니다. 매장에서 소리 내기 어려워 텍스트도 괜찮습니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-scope",
+      "topicIds": [
+        "scope"
+      ],
+      "statement": "처음에는 가습기 추천 상황 하나면 충분합니다. 음성이나 관리자 통계는 지금 필요하지 않습니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-scoring",
+      "topicIds": [
+        "scoring"
+      ],
+      "statement": "직원 점수나 순위는 원하지 않습니다. 다음에 무엇을 바꿀지 아는 게 중요합니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    },
+    {
+      "id": "retail-coaching-truth",
+      "topicIds": [
+        "truth"
+      ],
+      "statement": "상품 자료에 없는 성능·효과를 추측해서 안내하면 안 됩니다. 확인이 필요하다고 말해야 합니다.",
+      "sourceResourceIds": [],
+      "disclosureRule": "on_relevant_question"
+    }
+  ],
+  "constraints": [],
+  "routingExamples": [
+    {
+      "question": "어떤 문제가 제일 중요한가요?",
+      "expectedTopicIds": [
+        "problem",
+        "goal"
+      ]
+    }
+  ],
+  "answerExamples": []
+}

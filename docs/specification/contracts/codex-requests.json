@@ -1,0 +1,114 @@
+{
+  "description": "Wire examples matched against local 0.163.0 type definitions. No inference was executed.",
+  "messages": [
+    {
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "clientInfo": {
+          "name": "work_practice_lab",
+          "title": "Work Practice Lab",
+          "version": "0.1.0"
+        },
+        "capabilities": {
+          "experimentalApi": true,
+          "requestAttestation": false
+        }
+      }
+    },
+    {
+      "method": "initialized",
+      "params": {}
+    },
+    {
+      "id": 2,
+      "method": "thread/start",
+      "params": {
+        "model": "CONFIGURED_MODEL",
+        "cwd": "/ABSOLUTE/ATTEMPT/workspace",
+        "approvalPolicy": "on-request",
+        "sandbox": "workspace-write",
+        "serviceName": "work-practice-lab"
+      }
+    },
+    {
+      "id": 3,
+      "method": "turn/start",
+      "params": {
+        "threadId": "PROVIDER_THREAD_ID",
+        "clientUserMessageId": "CLIENT_MESSAGE_UUID",
+        "input": [
+          {
+            "type": "text",
+            "text": "USER_INPUT",
+            "text_elements": []
+          }
+        ],
+        "sandboxPolicy": {
+          "type": "workspaceWrite",
+          "writableRoots": [
+            "/ABSOLUTE/ATTEMPT/workspace"
+          ],
+          "networkAccess": false,
+          "excludeTmpdirEnvVar": true,
+          "excludeSlashTmp": true
+        }
+      }
+    },
+    {
+      "id": 4,
+      "method": "turn/interrupt",
+      "params": {
+        "threadId": "PROVIDER_THREAD_ID",
+        "turnId": "PROVIDER_TURN_ID"
+      }
+    },
+    {
+      "id": 5,
+      "method": "thread/resume",
+      "params": {
+        "threadId": "PROVIDER_THREAD_ID",
+        "excludeTurns": true
+      }
+    },
+    {
+      "id": 6,
+      "method": "thread/start",
+      "params": {
+        "model": "CONFIGURED_MODEL",
+        "ephemeral": true,
+        "environments": [],
+        "approvalPolicy": "never",
+        "sandbox": "read-only",
+        "developerInstructions": "ROLE_POLICY"
+      }
+    },
+    {
+      "id": 7,
+      "method": "turn/start",
+      "params": {
+        "threadId": "RESTRICTED_ROLE_THREAD_ID",
+        "environments": [],
+        "input": [
+          {
+            "type": "text",
+            "text": "SCOPED_CONTEXT",
+            "text_elements": []
+          }
+        ],
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "answer": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "answer"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

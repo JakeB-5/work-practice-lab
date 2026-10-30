@@ -1,0 +1,45 @@
+{
+  "checkedDate": "2026-10-30",
+  "scope": "Specification, contract and planning consistency only",
+  "results": {
+    "jsonSchema": {
+      "definitions": 51,
+      "fixtureCases": 18,
+      "status": "passed"
+    },
+    "openapi": {
+      "version": "3.1.0",
+      "operations": 67,
+      "status": "passed"
+    },
+    "storage": {
+      "tables": 25,
+      "checks": [
+        "DDL",
+        "one_active_attempt",
+        "state_enum",
+        "immutable_submission",
+        "immutable_completed_evaluation"
+      ],
+      "status": "passed"
+    },
+    "tasks": {
+      "epics": 17,
+      "tasks": 98,
+      "p0": 90,
+      "features": 18,
+      "acceptanceTests": 22,
+      "status": "passed"
+    },
+    "scoreFixtures": "passed",
+    "markdownLinks": "passed",
+    "codexWire": {
+      "requests": 7,
+      "schemaSha256": "92d920b10b9ce7871e21f49573275bb931a58ad7fd367ab71b3716edbb6a0352",
+      "status": "passed"
+    },
+    "applicationImplementation": "not_run",
+    "liveCodexInference": "not_run",
+    "runtimePermissionEnforcement": "not_run"
+  }
+}

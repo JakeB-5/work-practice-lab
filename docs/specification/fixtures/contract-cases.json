@@ -1,0 +1,668 @@
+{
+  "schemaVersion": "0.1.0",
+  "synthetic": true,
+  "description": "화면·계약 검증용 데이터. 실제 Codex 실행·제출·평가 성적이 아니다.",
+  "cases": [
+    {
+      "name": "running_attempt",
+      "schema": "Attempt",
+      "valid": true,
+      "data": {
+        "id": "att_00000000-0000-4000-8000-000000000001",
+        "scenarioVersionId": "scv_00000000-0000-4000-8000-000000000001",
+        "mode": "exam",
+        "executionMode": "replay",
+        "state": "running",
+        "version": 3,
+        "durationSeconds": 7200,
+        "startedAt": "2026-10-30T01:00:00.000Z",
+        "deadlineAt": "2026-10-30T03:00:00.000Z",
+        "pausedAt": null,
+        "pausedTotalMs": 0,
+        "conditions": [],
+        "createdAt": "2026-10-30T01:00:00.000Z"
+      }
+    },
+    {
+      "name": "completed_message",
+      "schema": "TextMessage",
+      "valid": true,
+      "data": {
+        "id": "msg_00000000-0000-4000-8000-000000000001",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "role": "stakeholder",
+        "author": "assistant",
+        "content": "먼저 고객이 어디에서 사용할지 확인하는 연습이 필요합니다.",
+        "status": "completed",
+        "sourceMessageIds": [],
+        "createdAt": "2026-10-30T01:00:00.000Z"
+      }
+    },
+    {
+      "name": "successful_operation",
+      "schema": "Operation",
+      "valid": true,
+      "data": {
+        "id": "op_00000000-0000-4000-8000-000000000001",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "kind": "agent.reply",
+        "role": "stakeholder",
+        "status": "succeeded",
+        "createdAt": "2026-10-30T01:00:00.000Z",
+        "updatedAt": "2026-10-30T01:00:00.000Z",
+        "resultRef": "/api/v1/attempts/att_00000000-0000-4000-8000-000000000001/messages?role=stakeholder",
+        "error": null
+      }
+    },
+    {
+      "name": "failed_operation",
+      "schema": "Operation",
+      "valid": true,
+      "data": {
+        "id": "op_00000000-0000-4000-8000-000000000002",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "kind": "agent.reply",
+        "role": "stakeholder",
+        "status": "failed",
+        "createdAt": "2026-10-30T01:00:00.000Z",
+        "updatedAt": "2026-10-30T01:00:00.000Z",
+        "resultRef": null,
+        "error": {
+          "code": "CODEX_FAILED",
+          "message": "가상 연결 실패",
+          "retryable": true,
+          "requestId": "fixture-failed"
+        }
+      }
+    },
+    {
+      "name": "interrupted_operation",
+      "schema": "Operation",
+      "valid": true,
+      "data": {
+        "id": "op_00000000-0000-4000-8000-000000000003",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "kind": "agent.reply",
+        "role": "stakeholder",
+        "status": "interrupted",
+        "createdAt": "2026-10-30T01:00:00.000Z",
+        "updatedAt": "2026-10-30T01:00:00.000Z",
+        "resultRef": null,
+        "error": null
+      }
+    },
+    {
+      "name": "uncertain_operation",
+      "schema": "Operation",
+      "valid": true,
+      "data": {
+        "id": "op_00000000-0000-4000-8000-000000000004",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "kind": "agent.reply",
+        "role": "stakeholder",
+        "status": "uncertain",
+        "createdAt": "2026-10-30T01:00:00.000Z",
+        "updatedAt": "2026-10-30T01:00:00.000Z",
+        "resultRef": null,
+        "error": null
+      }
+    },
+    {
+      "name": "stream_delta",
+      "schema": "Event",
+      "valid": true,
+      "data": {
+        "schemaVersion": "0.1.0",
+        "id": "evt_00000000-0000-4000-8000-000000000001",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "seq": 1,
+        "actor": "system",
+        "audience": "public",
+        "occurredAt": "2026-10-30T01:00:00.000Z",
+        "operationId": null,
+        "causationId": null,
+        "type": "message.delta",
+        "payload": {
+          "messageId": "msg_00000000-0000-4000-8000-000000000001",
+          "offset": 0,
+          "text": "예시 답변"
+        }
+      }
+    },
+    {
+      "name": "reconnect_gap",
+      "schema": "Event",
+      "valid": true,
+      "data": {
+        "schemaVersion": "0.1.0",
+        "id": "evt_00000000-0000-4000-8000-000000000006",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "seq": 6,
+        "actor": "system",
+        "audience": "public",
+        "occurredAt": "2026-10-30T01:00:00.000Z",
+        "operationId": null,
+        "causationId": null,
+        "type": "event.gap",
+        "payload": {
+          "fromSeq": 2,
+          "toSeq": 5,
+          "reason": "fixture missing interval"
+        }
+      }
+    },
+    {
+      "name": "file_conflict",
+      "schema": "ErrorEnvelope",
+      "valid": true,
+      "data": {
+        "error": {
+          "code": "VERSION_CONFLICT",
+          "message": "파일이 다른 작업에서 변경됐습니다.",
+          "retryable": false,
+          "requestId": "fixture-conflict"
+        }
+      }
+    },
+    {
+      "name": "sealed_submission",
+      "schema": "Submission",
+      "valid": true,
+      "data": {
+        "id": "sub_00000000-0000-4000-8000-000000000001",
+        "attemptId": "att_00000000-0000-4000-8000-000000000001",
+        "status": "sealed",
+        "cutoffAt": "2026-10-30T03:00:00.000Z",
+        "sealedAt": "2026-10-30T03:00:02.000Z",
+        "cutoffEventSeq": 20,
+        "manifestHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "files": [
+          {
+            "path": "DECISIONS.md",
+            "size": 120,
+            "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        ],
+        "excludedFiles": [
+          {
+            "path": "node_modules",
+            "reason": "dependency cache"
+          }
+        ],
+        "conditions": []
+      }
+    },
+    {
+      "name": "rated_evaluation",
+      "schema": "Evaluation",
+      "valid": true,
+      "data": {
+        "id": "eva_00000000-0000-4000-8000-000000000001",
+        "submissionId": "sub_00000000-0000-4000-8000-000000000001",
+        "interviewId": "int_00000000-0000-4000-8000-000000000001",
+        "version": 1,
+        "status": "completed",
+        "rubricVersion": "0.1.0",
+        "model": "fixture-model",
+        "promptVersion": "0.1.0",
+        "judgments": [
+          {
+            "criterionId": "TEC-1",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "TEC-2",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "TEC-3",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "TEC-4",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-1",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-2",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-3",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-4",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-1",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-2",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-3",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-4",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          }
+        ],
+        "scores": {
+          "technology": 75,
+          "intent": 75,
+          "cognition": 75,
+          "total": 225,
+          "assessedCount": 12
+        },
+        "nextActions": [
+          "검증 근거를 먼저 정하고 다음 시도에서 확인하세요."
+        ],
+        "conditions": [],
+        "createdAt": "2026-10-30T01:00:00.000Z"
+      }
+    },
+    {
+      "name": "incomplete_final_evaluation_rejected",
+      "schema": "Evaluation",
+      "valid": false,
+      "data": {
+        "id": "eva_00000000-0000-4000-8000-000000000002",
+        "submissionId": "sub_00000000-0000-4000-8000-000000000001",
+        "interviewId": "int_00000000-0000-4000-8000-000000000001",
+        "version": 1,
+        "status": "completed",
+        "rubricVersion": "0.1.0",
+        "model": "fixture-model",
+        "promptVersion": "0.1.0",
+        "judgments": [
+          {
+            "criterionId": "TEC-1",
+            "axis": "technology",
+            "status": "unassessed",
+            "rating": null,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [],
+            "limitation": "실행 기록이 누락돼 확인할 수 없습니다."
+          },
+          {
+            "criterionId": "TEC-2",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "TEC-3",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "TEC-4",
+            "axis": "technology",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-1",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-2",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-3",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "INT-4",
+            "axis": "intent",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-1",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-2",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-3",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          },
+          {
+            "criterionId": "COG-4",
+            "axis": "cognition",
+            "status": "rated",
+            "rating": 3,
+            "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+            "evidenceIds": [
+              "evi_00000000-0000-4000-8000-000000000001"
+            ],
+            "limitation": null,
+            "basis": "observed"
+          }
+        ],
+        "scores": {
+          "technology": null,
+          "intent": 75,
+          "cognition": 75,
+          "total": null,
+          "assessedCount": 11
+        },
+        "nextActions": [
+          "검증 근거를 먼저 정하고 다음 시도에서 확인하세요."
+        ],
+        "conditions": [],
+        "createdAt": "2026-10-30T01:00:00.000Z"
+      }
+    },
+    {
+      "name": "example_scenario_manifest",
+      "schema": "ScenarioManifest",
+      "valid": true,
+      "data": {
+        "schemaVersion": "0.1.0",
+        "scenarioId": "retail-coaching",
+        "version": "0.1.0",
+        "title": "신입 직원 고객 응대 연습",
+        "summary": "계약 확인용 예시 manifest. 실제 배포 과제 패키지가 아닙니다.",
+        "durationSeconds": 7200,
+        "publicBrief": "public/brief.md",
+        "resources": [
+          {
+            "id": "catalog",
+            "title": "가상 상품 자료",
+            "path": "public/resources/catalog.json",
+            "mediaType": "application/json"
+          }
+        ],
+        "starterDir": "public/starter",
+        "prepare": [
+          {
+            "argv": [
+              "pnpm",
+              "install",
+              "--frozen-lockfile"
+            ],
+            "cwdRelative": ".",
+            "timeoutSeconds": 600,
+            "environmentKeys": []
+          }
+        ],
+        "run": {
+          "argv": [
+            "pnpm",
+            "dev",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "${PORT}"
+          ],
+          "cwdRelative": ".",
+          "timeoutSeconds": 120,
+          "environmentKeys": [
+            "WPL_SCENARIO_AI_URL",
+            "WPL_SCENARIO_AI_TOKEN"
+          ]
+        },
+        "validationProfile": "private/validation.json"
+      }
+    },
+    {
+      "name": "runtime_not_yet_inferred",
+      "schema": "RuntimeProbe",
+      "valid": true,
+      "data": {
+        "binaryPath": "/configured/codex",
+        "version": "0.163.0",
+        "authState": "signed_in",
+        "inferenceState": "not_tested",
+        "capabilities": {
+          "restrictedRole": false,
+          "coderWorkspace": false,
+          "interrupt": false,
+          "resume": false
+        },
+        "diagnostics": [
+          "스키마 생성만 확인됨. 라이브 연결 검증 전."
+        ]
+      }
+    },
+    {
+      "name": "unassessed_cannot_have_score",
+      "schema": "CriterionJudgment",
+      "valid": false,
+      "data": {
+        "criterionId": "TEC-1",
+        "axis": "technology",
+        "status": "unassessed",
+        "rating": 4,
+        "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+        "evidenceIds": [
+          "evi_00000000-0000-4000-8000-000000000001"
+        ],
+        "limitation": "unknown"
+      }
+    },
+    {
+      "name": "rated_requires_evidence",
+      "schema": "CriterionJudgment",
+      "valid": false,
+      "data": {
+        "criterionId": "TEC-1",
+        "axis": "technology",
+        "status": "rated",
+        "rating": 3,
+        "rationale": "이 fixture는 계약과 화면 검증용 가상 판정입니다.",
+        "evidenceIds": [],
+        "limitation": null
+      }
+    },
+    {
+      "name": "reject_parent_path",
+      "schema": "RelativePath",
+      "valid": false,
+      "data": "../private/rubric.json"
+    },
+    {
+      "name": "reject_unknown_attempt_field",
+      "schema": "Attempt",
+      "valid": false,
+      "data": {
+        "id": "att_00000000-0000-4000-8000-000000000001",
+        "scenarioVersionId": "scv_00000000-0000-4000-8000-000000000001",
+        "mode": "exam",
+        "executionMode": "replay",
+        "state": "running",
+        "version": 3,
+        "durationSeconds": 7200,
+        "startedAt": "2026-10-30T01:00:00.000Z",
+        "deadlineAt": "2026-10-30T03:00:00.000Z",
+        "pausedAt": null,
+        "pausedTotalMs": 0,
+        "conditions": [],
+        "createdAt": "2026-10-30T01:00:00.000Z",
+        "officialCofaScore": 290
+      }
+    }
+  ]
+}

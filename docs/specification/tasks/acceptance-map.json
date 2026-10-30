@@ -1,0 +1,289 @@
+{
+  "schemaVersion": "0.1.0",
+  "features": [
+    {
+      "id": "F01",
+      "taskExpression": "T05.01, T05.02, T05.03, T05.05, T08.03"
+    },
+    {
+      "id": "F02",
+      "taskExpression": "T00.01~T00.06, T03.02~T03.04, T04.02, T08.03"
+    },
+    {
+      "id": "F03",
+      "taskExpression": "T05.03, T05.05, T06.01~T06.03, T08.04"
+    },
+    {
+      "id": "F04",
+      "taskExpression": "T03.01~T03.06, T06.04, T08.04"
+    },
+    {
+      "id": "F05",
+      "taskExpression": "T07.02, T07.03, T07.07, T08.05"
+    },
+    {
+      "id": "F06",
+      "taskExpression": "T07.04, T07.06, T08.06"
+    },
+    {
+      "id": "F07",
+      "taskExpression": "T07.05, T08.06"
+    },
+    {
+      "id": "F08",
+      "taskExpression": "T04.01~T04.05, T08.07"
+    },
+    {
+      "id": "F09",
+      "taskExpression": "T02.04~T02.06, T03.05, T10.04, T13.03"
+    },
+    {
+      "id": "F10",
+      "taskExpression": "T09.01~T09.05"
+    },
+    {
+      "id": "F11",
+      "taskExpression": "T11.01~T11.03, T08.08"
+    },
+    {
+      "id": "F12",
+      "taskExpression": "T10.01~T10.05, T11.04~T11.07, T12.01"
+    },
+    {
+      "id": "F13",
+      "taskExpression": "T13.01~T13.05"
+    },
+    {
+      "id": "F14",
+      "taskExpression": "T04.06, T12.02~T12.04"
+    },
+    {
+      "id": "F15",
+      "taskExpression": "T15.01, T15.02"
+    },
+    {
+      "id": "F16",
+      "taskExpression": "T15.03, T15.04"
+    },
+    {
+      "id": "F17",
+      "taskExpression": "T15.05, T15.06"
+    },
+    {
+      "id": "F18",
+      "taskExpression": "T16.01, T16.02（후속 범위 재설계）"
+    }
+  ],
+  "acceptance": [
+    {
+      "id": "A01",
+      "title": "실제 연결 성공",
+      "taskIds": [
+        "T00.02",
+        "T03.06",
+        "T08.03"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A02",
+      "title": "잘못된 실행 경로",
+      "taskIds": [
+        "T00.01",
+        "T04.02",
+        "T08.03"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A03",
+      "title": "담당자 질문과 답변",
+      "taskIds": [
+        "T06.03",
+        "T06.06"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A04",
+      "title": "비공개 기준 요청",
+      "taskIds": [
+        "T05.02",
+        "T06.02",
+        "T06.06"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A05",
+      "title": "담당자 답변 공유",
+      "taskIds": [
+        "T06.04",
+        "T08.04"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A06",
+      "title": "파일 수정 후 테스트",
+      "taskIds": [
+        "T03.06",
+        "T07.03",
+        "T10.02"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A07",
+      "title": "파일 충돌",
+      "taskIds": [
+        "T07.03",
+        "T08.05"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A08",
+      "title": "새로고침·복원",
+      "taskIds": [
+        "T02.05",
+        "T04.05",
+        "T08.07"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A09",
+      "title": "접수 직후 연결 단절",
+      "taskIds": [
+        "T03.04",
+        "T04.04",
+        "T13.04"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A10",
+      "title": "모델 중단",
+      "taskIds": [
+        "T03.03",
+        "T07.06",
+        "T08.04"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A11",
+      "title": "중복 제출",
+      "taskIds": [
+        "T09.02",
+        "T09.04",
+        "T09.05"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A12",
+      "title": "시간 만료와 실행 경합",
+      "taskIds": [
+        "T04.03",
+        "T07.07",
+        "T09.05"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A13",
+      "title": "제출 후 변경",
+      "taskIds": [
+        "T09.03",
+        "T09.05",
+        "T10.02"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A14",
+      "title": "검사 실패·시간 초과",
+      "taskIds": [
+        "T10.02",
+        "T10.04",
+        "T10.05"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A15",
+      "title": "허위 근거 위치",
+      "taskIds": [
+        "T11.05"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A16",
+      "title": "사후 질문 중 도움 차단",
+      "taskIds": [
+        "T04.04",
+        "T11.03",
+        "T08.08"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A17",
+      "title": "평가 재시도",
+      "taskIds": [
+        "T11.05",
+        "T12.01"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A18",
+      "title": "비공개 정보 열기",
+      "taskIds": [
+        "T13.01",
+        "T13.03"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A19",
+      "title": "과제 앱용 AI",
+      "taskIds": [
+        "T06.05",
+        "T06.06"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A20",
+      "title": "내보내기",
+      "taskIds": [
+        "T12.02",
+        "T12.04"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A21",
+      "title": "과제 전환",
+      "taskIds": [
+        "T04.06",
+        "T05.07",
+        "T14.02"
+      ],
+      "integrationTask": "T14.03"
+    },
+    {
+      "id": "A22",
+      "title": "불필요한 도구 제한",
+      "taskIds": [
+        "T00.04",
+        "T06.06"
+      ],
+      "integrationTask": "T14.03"
+    }
+  ]
+}

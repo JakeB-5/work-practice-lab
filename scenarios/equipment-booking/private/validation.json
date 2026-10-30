@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "checks": [
+    {
+      "id": "booking-flow",
+      "kind": "http",
+      "description": "예약·중복·맞닿는 시간·취소·권한 확인"
+    },
+    {
+      "id": "booking-race",
+      "kind": "concurrency",
+      "description": "동시 요청 중 하나만 저장되는지 확인"
+    }
+  ]
+}

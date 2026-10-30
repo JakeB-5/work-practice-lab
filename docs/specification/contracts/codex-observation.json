@@ -1,0 +1,57 @@
+{
+  "checkedAt": "2026-10-30",
+  "cliVersion": "0.163.0",
+  "method": "Local codex app-server generate-ts and generate-json-schema, with and without --experimental",
+  "inferenceExecuted": false,
+  "permissionEnforcementVerified": false,
+  "stable": {
+    "threadStart": [
+      "model",
+      "cwd",
+      "approvalPolicy",
+      "sandbox",
+      "config",
+      "baseInstructions",
+      "developerInstructions",
+      "ephemeral"
+    ],
+    "turnStart": [
+      "threadId",
+      "clientUserMessageId",
+      "input",
+      "sandboxPolicy",
+      "disabledPluginIds",
+      "outputSchema"
+    ],
+    "threadSandboxEnum": [
+      "read-only",
+      "workspace-write",
+      "danger-full-access"
+    ],
+    "turnSandboxTypes": [
+      "readOnly",
+      "workspaceWrite",
+      "externalSandbox",
+      "dangerFullAccess"
+    ],
+    "textInputRequired": [
+      "type",
+      "text",
+      "text_elements"
+    ]
+  },
+  "experimental": {
+    "threadStart": [
+      "environments",
+      "permissions",
+      "runtimeWorkspaceRoots"
+    ],
+    "turnStart": [
+      "environments",
+      "permissions",
+      "runtimeWorkspaceRoots"
+    ],
+    "observation": "Empty environments is documented in generated field comments as disabling environment access; external tools and actual restrictions still need testing."
+  },
+  "gate": "G-RUNTIME remains open; schema availability is not runtime success."
+}

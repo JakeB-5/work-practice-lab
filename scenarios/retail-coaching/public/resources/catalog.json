@@ -1,0 +1,104 @@
+[
+  {
+    "productId": "P1",
+    "name": "모닝 미니",
+    "priceWon": 29000,
+    "useCases": [
+      "책상"
+    ],
+    "verifiedFeatures": [
+      "1L 물통",
+      "USB 전원",
+      "상부 급수"
+    ],
+    "limitations": [
+      "작은 공간용",
+      "전용 어댑터 별도"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  },
+  {
+    "productId": "P2",
+    "name": "리브 베드",
+    "priceWon": 59000,
+    "useCases": [
+      "침실"
+    ],
+    "verifiedFeatures": [
+      "3L 물통",
+      "야간 표시등 끄기",
+      "저소음 모드"
+    ],
+    "limitations": [
+      "저소음 모드의 실제 체감은 환경에 따라 다름"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  },
+  {
+    "productId": "P3",
+    "name": "클린 와이드",
+    "priceWon": 69000,
+    "useCases": [
+      "침실·작은 거실"
+    ],
+    "verifiedFeatures": [
+      "3.5L 물통",
+      "넓은 물통 입구",
+      "분리 세척 구조"
+    ],
+    "limitations": [
+      "식기세척기 사용 불가"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  },
+  {
+    "productId": "P4",
+    "name": "홈 플러스",
+    "priceWon": 89000,
+    "useCases": [
+      "거실"
+    ],
+    "verifiedFeatures": [
+      "5L 물통",
+      "습도 설정",
+      "자동 정지"
+    ],
+    "limitations": [
+      "작은 책상에는 크기가 큼"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  },
+  {
+    "productId": "P5",
+    "name": "이지 데일리",
+    "priceWon": 49000,
+    "useCases": [
+      "작은 방"
+    ],
+    "verifiedFeatures": [
+      "2.5L 물통",
+      "물통 손잡이",
+      "분리 세척"
+    ],
+    "limitations": [
+      "습도 자동 설정 없음"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  },
+  {
+    "productId": "P6",
+    "name": "트래블 컵",
+    "priceWon": 19000,
+    "useCases": [
+      "이동·책상"
+    ],
+    "verifiedFeatures": [
+      "500mL 용량",
+      "가벼운 본체"
+    ],
+    "limitations": [
+      "장시간 사용에는 자주 급수 필요"
+    ],
+    "sourceNote": "연습용 가상 상품. 의료·건강 효과에 관한 검증된 정보 없음."
+  }
+]

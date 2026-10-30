@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "checks": [
+    {
+      "id": "retail-page",
+      "kind": "browser",
+      "description": "연습 시작과 대화·추천·피드백·재답변 흐름 확인"
+    },
+    {
+      "id": "retail-grounding",
+      "kind": "semantic",
+      "description": "질문 없는 추천과 고객 필요에 연결된 추천, 자료 밖 주장을 비교"
+    }
+  ]
+}

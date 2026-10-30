@@ -1,0 +1,14 @@
+[
+  {
+    "id": "camera-a",
+    "name": "카메라 A"
+  },
+  {
+    "id": "camera-b",
+    "name": "카메라 B"
+  },
+  {
+    "id": "mic-a",
+    "name": "마이크 A"
+  }
+]

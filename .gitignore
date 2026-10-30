@@ -1,0 +1,25 @@
+node_modules/
+dist/
+.wpl-data/
+.env
+playwright-report/
+test-results/
+*.log
+.DS_Store
+
+# Local practice data, exports, and credentials
+.wpl-data*/
+.env.*
+!.env.example
+output/
+tmp/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.pem
+*.key
+auth.json
+coverage/
+docs/evidence/*
+!docs/evidence/README.md

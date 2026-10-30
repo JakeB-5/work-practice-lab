@@ -1,0 +1,4781 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://work-practice-lab.local/contracts/domain.schema.json",
+  "title": "Work Practice Lab application contracts 0.1.0",
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "pattern": "^[a-z]{2,5}_[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "DateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "Sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "RelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000]+$"
+    },
+    "Mode": {
+      "type": "string",
+      "enum": [
+        "practice",
+        "exam",
+        "developer"
+      ]
+    },
+    "Role": {
+      "type": "string",
+      "enum": [
+        "stakeholder",
+        "coder",
+        "evaluator",
+        "scenario_app"
+      ]
+    },
+    "AttemptState": {
+      "type": "string",
+      "enum": [
+        "preparing",
+        "preparation_failed",
+        "ready",
+        "running",
+        "pausing",
+        "paused",
+        "sealing",
+        "submission_failed",
+        "submitted",
+        "interviewing",
+        "evaluating",
+        "evaluation_failed",
+        "completed",
+        "abandoned"
+      ]
+    },
+    "Condition": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "private_material_exposed",
+            "prior_solution_seen",
+            "continued_attempt",
+            "time_changed",
+            "model_changed",
+            "profile_changed",
+            "changed_after_cutoff",
+            "record_gap",
+            "clock_anomaly",
+            "developer_run",
+            "fault_injected"
+          ]
+        },
+        "occurredAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "code",
+        "occurredAt",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "Attempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "scenarioVersionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "mode": {
+          "$ref": "#/$defs/Mode"
+        },
+        "executionMode": {
+          "type": "string",
+          "enum": [
+            "live",
+            "replay"
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/AttemptState"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 86400
+        },
+        "startedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deadlineAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pausedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pausedTotalMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "createdAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "scenarioVersionId",
+        "mode",
+        "executionMode",
+        "state",
+        "version",
+        "durationSeconds",
+        "startedAt",
+        "deadlineAt",
+        "pausedAt",
+        "pausedTotalMs",
+        "conditions",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "requestId": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "retryable",
+        "requestId"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorEnvelope": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/Error"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "Operation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "role": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Role"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "awaiting_approval",
+            "interrupting",
+            "succeeded",
+            "failed",
+            "interrupted",
+            "uncertain"
+          ]
+        },
+        "createdAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "resultRef": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1024
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Error"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result": {},
+        "historyAvailable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "kind",
+        "role",
+        "status",
+        "createdAt",
+        "updatedAt",
+        "resultRef",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "OperationRef": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "$ref": "#/$defs/Id"
+        }
+      },
+      "required": [
+        "operationId"
+      ],
+      "additionalProperties": false
+    },
+    "PageOperation": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Operation"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
+    "TextMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "role": {
+          "$ref": "#/$defs/Role"
+        },
+        "author": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant",
+            "user_edited",
+            "ai_summary"
+          ]
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 65536
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "streaming",
+            "completed",
+            "failed",
+            "interrupted",
+            "uncertain"
+          ]
+        },
+        "sourceMessageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          }
+        },
+        "createdAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "operationId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "role",
+        "author",
+        "content",
+        "status",
+        "sourceMessageIds",
+        "createdAt"
+      ],
+      "additionalProperties": false
+    },
+    "MessagePage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TextMessage"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
+    "CommandSpec": {
+      "type": "object",
+      "properties": {
+        "argv": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 4096
+          },
+          "minItems": 1,
+          "maxItems": 64
+        },
+        "cwdRelative": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1800
+        },
+        "environmentKeys": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          }
+        }
+      },
+      "required": [
+        "argv",
+        "cwdRelative",
+        "timeoutSeconds",
+        "environmentKeys"
+      ],
+      "additionalProperties": false
+    },
+    "Resource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "mediaType": {
+          "type": "string",
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "path",
+        "mediaType"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioManifest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": "0.1.0"
+        },
+        "scenarioId": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{2,63}$"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "summary": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "durationSeconds": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 86400
+        },
+        "publicBrief": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Resource"
+          }
+        },
+        "starterDir": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "prepare": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CommandSpec"
+          }
+        },
+        "run": {
+          "$ref": "#/$defs/CommandSpec"
+        },
+        "validationProfile": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "allowedModels": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "scenarioId",
+        "version",
+        "title",
+        "summary",
+        "durationSeconds",
+        "publicBrief",
+        "resources",
+        "starterDir",
+        "prepare",
+        "run",
+        "validationProfile"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioPublic": {
+      "type": "object",
+      "properties": {
+        "versionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "scenarioId": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "durationSeconds": {
+          "type": "integer"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "mediaType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "mediaType"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "ready": {
+          "type": "boolean"
+        },
+        "briefResourceId": {
+          "type": "string"
+        },
+        "allowedModels": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 100,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128,
+                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]*$"
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "versionId",
+        "scenarioId",
+        "version",
+        "title",
+        "summary",
+        "durationSeconds",
+        "resources",
+        "ready",
+        "briefResourceId"
+      ],
+      "additionalProperties": false
+    },
+    "ScenarioList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ScenarioPublic"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "AttemptList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Attempt"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
+    "FileContent": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 2097152
+        },
+        "encoding": {
+          "const": "utf-8"
+        },
+        "sha256": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "version": {
+          "type": "integer"
+        },
+        "modifiedAt": {
+          "$ref": "#/$defs/DateTime"
+        }
+      },
+      "required": [
+        "path",
+        "content",
+        "encoding",
+        "sha256",
+        "version",
+        "modifiedAt"
+      ],
+      "additionalProperties": false
+    },
+    "FileEntry": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "file",
+            "directory",
+            "blocked_symlink"
+          ]
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "editable": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path",
+        "kind",
+        "size",
+        "editable"
+      ],
+      "additionalProperties": false
+    },
+    "FileList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FileEntry"
+          }
+        },
+        "nextCursor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "items",
+        "nextCursor"
+      ],
+      "additionalProperties": false
+    },
+    "SnapshotFile": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/$defs/RelativePath"
+        },
+        "size": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "#/$defs/Sha256"
+        }
+      },
+      "required": [
+        "path",
+        "size",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Submission": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "status": {
+          "const": "sealed"
+        },
+        "cutoffAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "sealedAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "cutoffEventSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "manifestHash": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SnapshotFile"
+          }
+        },
+        "excludedFiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/RelativePath"
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "path",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "status",
+        "cutoffAt",
+        "sealedAt",
+        "cutoffEventSeq",
+        "manifestHash",
+        "files",
+        "excludedFiles",
+        "conditions"
+      ],
+      "additionalProperties": false
+    },
+    "Locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "file"
+            },
+            "submissionId": {
+              "$ref": "#/$defs/Id"
+            },
+            "path": {
+              "$ref": "#/$defs/RelativePath"
+            },
+            "sha256": {
+              "$ref": "#/$defs/Sha256"
+            },
+            "lineStart": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "lineEnd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind",
+            "submissionId",
+            "path",
+            "sha256",
+            "lineStart",
+            "lineEnd"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "event"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "kind",
+            "attemptId",
+            "seq"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "validation"
+            },
+            "validationRunId": {
+              "$ref": "#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "validationRunId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "capture"
+            },
+            "validationRunId": {
+              "$ref": "#/$defs/Id"
+            },
+            "captureId": {
+              "$ref": "#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "validationRunId",
+            "captureId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "manual"
+            },
+            "confirmationEventId": {
+              "$ref": "#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "confirmationEventId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "interview"
+            },
+            "interviewId": {
+              "$ref": "#/$defs/Id"
+            },
+            "questionId": {
+              "$ref": "#/$defs/Id"
+            }
+          },
+          "required": [
+            "kind",
+            "interviewId",
+            "questionId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "assessment_inventory"
+            },
+            "submissionId": {
+              "$ref": "#/$defs/Id"
+            },
+            "interviewId": {
+              "$ref": "#/$defs/Id"
+            },
+            "digest": {
+              "$ref": "#/$defs/Sha256"
+            }
+          },
+          "required": [
+            "kind",
+            "submissionId",
+            "interviewId",
+            "digest"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Evidence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "submissionId": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "message",
+            "file",
+            "command",
+            "browser_capture",
+            "manual_confirmation",
+            "condition"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "user",
+            "coder",
+            "stakeholder",
+            "evaluator",
+            "scenario_app",
+            "system"
+          ]
+        },
+        "locator": {
+          "$ref": "#/$defs/Locator"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "redacted": {
+          "type": "boolean"
+        },
+        "observedAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "confidenceNote": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "submissionId",
+        "kind",
+        "source",
+        "locator",
+        "sha256",
+        "redacted",
+        "observedAt",
+        "confidenceNote"
+      ],
+      "additionalProperties": false
+    },
+    "ValidationRun": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "submissionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "checkId": {
+          "type": "string"
+        },
+        "checkVersion": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "passed",
+            "failed",
+            "timed_out",
+            "error",
+            "cancelled",
+            "not_run"
+          ]
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "fixed_check",
+            "user_modified_test",
+            "user_confirmation",
+            "model_interpretation"
+          ]
+        },
+        "startedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "endedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          }
+        },
+        "artifactHashBefore": {
+          "$ref": "#/$defs/Sha256"
+        },
+        "artifactHashAfter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "submissionId",
+        "checkId",
+        "checkVersion",
+        "status",
+        "origin",
+        "startedAt",
+        "endedAt",
+        "exitCode",
+        "evidenceIds",
+        "artifactHashBefore",
+        "artifactHashAfter"
+      ],
+      "additionalProperties": false
+    },
+    "ValidationList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ValidationRun"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "Axis": {
+      "type": "string",
+      "enum": [
+        "technology",
+        "intent",
+        "cognition"
+      ]
+    },
+    "Question": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          }
+        },
+        "focusAxis": {
+          "$ref": "#/$defs/Axis"
+        },
+        "criterionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "evidenceIds",
+        "focusAxis"
+      ],
+      "additionalProperties": false
+    },
+    "Answer": {
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 8000
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "answered",
+            "skipped"
+          ]
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/DateTime"
+        }
+      },
+      "required": [
+        "questionId",
+        "text",
+        "status",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "Interview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "submissionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "answering",
+            "finalized"
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Question"
+          },
+          "minItems": 3,
+          "maxItems": 5
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Answer"
+          }
+        },
+        "createdAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "finalizedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverageVersion": {
+          "type": "integer"
+        },
+        "supplementsInterviewId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "operationId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "submissionId",
+        "version",
+        "status",
+        "questions",
+        "answers",
+        "createdAt",
+        "finalizedAt"
+      ],
+      "additionalProperties": false
+    },
+    "CriterionJudgment": {
+      "type": "object",
+      "properties": {
+        "criterionId": {
+          "type": "string",
+          "maxLength": 80
+        },
+        "axis": {
+          "$ref": "#/$defs/Axis"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "rated"
+          ]
+        },
+        "rating": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "rationale": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "evidenceIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 1
+        },
+        "limitation": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "observed",
+            "not_demonstrated"
+          ]
+        }
+      },
+      "required": [
+        "criterionId",
+        "axis",
+        "status",
+        "rating",
+        "rationale",
+        "evidenceIds",
+        "limitation",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "EvaluationDraft": {
+      "type": "object",
+      "properties": {
+        "judgments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CriterionJudgment"
+          },
+          "minItems": 12,
+          "maxItems": 12
+        },
+        "nextActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "maxItems": 3
+        }
+      },
+      "required": [
+        "judgments",
+        "nextActions"
+      ],
+      "additionalProperties": false
+    },
+    "Scores": {
+      "type": "object",
+      "properties": {
+        "technology": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intent": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cognition": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "total": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 300
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assessedCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12
+        }
+      },
+      "required": [
+        "technology",
+        "intent",
+        "cognition",
+        "total",
+        "assessedCount"
+      ],
+      "additionalProperties": false
+    },
+    "Evaluation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "submissionId": {
+          "$ref": "#/$defs/Id"
+        },
+        "interviewId": {
+          "$ref": "#/$defs/Id"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "validating",
+            "completed",
+            "failed"
+          ]
+        },
+        "rubricVersion": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "promptVersion": {
+          "type": "string"
+        },
+        "judgments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CriterionJudgment"
+          }
+        },
+        "scores": {
+          "$ref": "#/$defs/Scores"
+        },
+        "nextActions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Condition"
+          }
+        },
+        "createdAt": {
+          "$ref": "#/$defs/DateTime"
+        },
+        "inputCoverage": {
+          "type": "object",
+          "properties": {
+            "included": {
+              "type": "integer"
+            },
+            "excluded": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "included",
+            "excluded"
+          ],
+          "additionalProperties": false
+        },
+        "executionMode": {
+          "type": "string",
+          "enum": [
+            "live",
+            "replay"
+          ]
+        },
+        "scoringPolicyVersion": {
+          "type": "string"
+        },
+        "isDemo": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "submissionId",
+        "interviewId",
+        "version",
+        "status",
+        "rubricVersion",
+        "model",
+        "promptVersion",
+        "judgments",
+        "scores",
+        "nextActions",
+        "conditions",
+        "createdAt"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "completed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "judgments": {
+                "minItems": 12,
+                "maxItems": 12
+              },
+              "scores": {
+                "properties": {
+                  "technology": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "intent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "cognition": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "total": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 300
+                  },
+                  "assessedCount": {
+                    "const": 12
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "EvaluationList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evaluation"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "RuntimeProbe": {
+      "type": "object",
+      "properties": {
+        "binaryPath": {
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "authState": {
+          "type": "string",
+          "enum": [
+            "signed_in",
+            "signed_out",
+            "unknown"
+          ]
+        },
+        "inferenceState": {
+          "type": "string",
+          "enum": [
+            "not_tested",
+            "passed",
+            "failed"
+          ]
+        },
+        "capabilities": {
+          "type": "object",
+          "properties": {
+            "restrictedRole": {
+              "type": "boolean"
+            },
+            "coderWorkspace": {
+              "type": "boolean"
+            },
+            "interrupt": {
+              "type": "boolean"
+            },
+            "resume": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "restrictedRole",
+            "coderWorkspace",
+            "interrupt",
+            "resume"
+          ],
+          "additionalProperties": false
+        },
+        "diagnostics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "binaryPath",
+        "version",
+        "authState",
+        "inferenceState",
+        "capabilities",
+        "diagnostics"
+      ],
+      "additionalProperties": false
+    },
+    "RuntimeConfig": {
+      "type": "object",
+      "properties": {
+        "binaryPath": {
+          "type": "string"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "maxConcurrentInference": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "binaryPath",
+        "model",
+        "maxConcurrentInference"
+      ],
+      "additionalProperties": false
+    },
+    "ModelList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "label"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "accessVerified": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "items",
+        "accessVerified"
+      ],
+      "additionalProperties": false
+    },
+    "Approval": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "operationId": {
+          "$ref": "#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "command",
+            "file_change",
+            "network",
+            "permissions",
+            "user_input",
+            "custom_tool"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "availableDecisions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "resolved",
+            "expired"
+          ]
+        },
+        "expiresAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DateTime"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "permissions": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "operationId",
+        "kind",
+        "message",
+        "availableDecisions",
+        "status",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovalList": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Approval"
+          }
+        }
+      },
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "Process": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "terminal",
+            "dev_server",
+            "prepare",
+            "validation"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "starting",
+            "running",
+            "stopping",
+            "exited",
+            "failed",
+            "uncertain",
+            "orphaned"
+          ]
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "port": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "kind",
+        "state",
+        "exitCode",
+        "port"
+      ],
+      "additionalProperties": false
+    },
+    "TerminalConnection": {
+      "type": "object",
+      "properties": {
+        "process": {
+          "$ref": "#/$defs/Process"
+        },
+        "wsTicket": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "$ref": "#/$defs/DateTime"
+        }
+      },
+      "required": [
+        "process",
+        "wsTicket",
+        "expiresAt"
+      ],
+      "additionalProperties": false
+    },
+    "Preview": {
+      "type": "object",
+      "properties": {
+        "process": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Process"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uri"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ready": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "process",
+        "url",
+        "ready"
+      ],
+      "additionalProperties": false
+    },
+    "Export": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "evaluationId": {
+          "$ref": "#/$defs/Id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "completed",
+            "failed"
+          ]
+        },
+        "downloadPath": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "evaluationId",
+        "status",
+        "downloadPath",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "Note": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/Id"
+        },
+        "attemptId": {
+          "$ref": "#/$defs/Id"
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 16384
+        },
+        "author": {
+          "type": "string",
+          "enum": [
+            "user",
+            "ai_summary",
+            "user_edited"
+          ]
+        },
+        "sourceMessageIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          }
+        },
+        "version": {
+          "type": "integer"
+        },
+        "updatedAt": {
+          "$ref": "#/$defs/DateTime"
+        }
+      },
+      "required": [
+        "id",
+        "attemptId",
+        "content",
+        "author",
+        "sourceMessageIds",
+        "version",
+        "updatedAt"
+      ],
+      "additionalProperties": false
+    },
+    "Event": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "attempt.state"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "$ref": "#/$defs/AttemptState"
+                },
+                "to": {
+                  "$ref": "#/$defs/AttemptState"
+                },
+                "version": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "from",
+                "to",
+                "version"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "attempt.condition"
+            },
+            "payload": {
+              "$ref": "#/$defs/Condition"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "attempt.clock"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "deadlineAt": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/DateTime"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "remainingMs": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "deadlineAt",
+                "remainingMs"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "message.accepted"
+            },
+            "payload": {
+              "$ref": "#/$defs/TextMessage"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "message.delta"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "messageId",
+                "offset",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "message.completed"
+            },
+            "payload": {
+              "$ref": "#/$defs/TextMessage"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "operation.progress"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "operationId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "queued",
+                    "running",
+                    "awaiting_approval",
+                    "interrupting",
+                    "succeeded",
+                    "failed",
+                    "interrupted",
+                    "uncertain"
+                  ]
+                },
+                "summary": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "operationId",
+                "status",
+                "summary"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "operation.succeeded"
+            },
+            "payload": {
+              "$ref": "#/$defs/Operation"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "operation.failed"
+            },
+            "payload": {
+              "$ref": "#/$defs/Operation"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "operation.interrupted"
+            },
+            "payload": {
+              "$ref": "#/$defs/Operation"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "operation.uncertain"
+            },
+            "payload": {
+              "$ref": "#/$defs/Operation"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "approval.requested"
+            },
+            "payload": {
+              "$ref": "#/$defs/Approval"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "approval.resolved"
+            },
+            "payload": {
+              "$ref": "#/$defs/Approval"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "workspace.changed"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "$ref": "#/$defs/RelativePath"
+                },
+                "beforeHash": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/Sha256"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "afterHash": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/Sha256"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "actor": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "coder",
+                    "system"
+                  ]
+                },
+                "afterCutoff": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "path",
+                "beforeHash",
+                "afterHash",
+                "actor",
+                "afterCutoff"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "terminal.input"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "processId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "processId",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "terminal.output"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "processId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "text": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "processId",
+                "offset",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "process.exited"
+            },
+            "payload": {
+              "$ref": "#/$defs/Process"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "output.truncated"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "processId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "processId",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "submission.progress"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "operationId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "phase": {
+                  "type": "string",
+                  "enum": [
+                    "blocking",
+                    "draining",
+                    "copying",
+                    "committing"
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "operationId",
+                "phase",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "submission.sealed"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "submissionId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "manifestHash": {
+                  "$ref": "#/$defs/Sha256"
+                }
+              },
+              "required": [
+                "submissionId",
+                "manifestHash"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "validation.completed"
+            },
+            "payload": {
+              "$ref": "#/$defs/ValidationRun"
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "interview.ready"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "interviewId": {
+                  "$ref": "#/$defs/Id"
+                }
+              },
+              "required": [
+                "interviewId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "evaluation.completed"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "evaluationId": {
+                  "$ref": "#/$defs/Id"
+                }
+              },
+              "required": [
+                "evaluationId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "fact.disclosed"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "factIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "messageId",
+                "factIds"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "session.recreated"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "sessionId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "previousSessionId": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/Id"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "sessionId",
+                "previousSessionId",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "event.gap"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "fromSeq": {
+                  "type": "integer"
+                },
+                "toSeq": {
+                  "type": "integer"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "fromSeq",
+                "toSeq",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "tool.result"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "operationId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "kind": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "evidenceIds": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/Id"
+                  }
+                }
+              },
+              "required": [
+                "operationId",
+                "kind",
+                "status",
+                "evidenceIds"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": "0.1.0"
+            },
+            "id": {
+              "$ref": "#/$defs/Id"
+            },
+            "attemptId": {
+              "$ref": "#/$defs/Id"
+            },
+            "seq": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "actor": {
+              "type": "string",
+              "enum": [
+                "user",
+                "stakeholder",
+                "coder",
+                "evaluator",
+                "scenario_app",
+                "system"
+              ]
+            },
+            "audience": {
+              "type": "string",
+              "enum": [
+                "public",
+                "developer",
+                "evaluator"
+              ]
+            },
+            "occurredAt": {
+              "$ref": "#/$defs/DateTime"
+            },
+            "operationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "causationId": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": {
+              "const": "usage.updated"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "$ref": "#/$defs/Role"
+                },
+                "sessionId": {
+                  "$ref": "#/$defs/Id"
+                },
+                "inputTokens": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "outputTokens": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "basis": {
+                  "type": "string",
+                  "enum": [
+                    "cumulative",
+                    "turn_delta",
+                    "unknown"
+                  ]
+                }
+              },
+              "required": [
+                "role",
+                "sessionId",
+                "inputTokens",
+                "outputTokens",
+                "basis"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "id",
+            "attemptId",
+            "seq",
+            "actor",
+            "audience",
+            "occurredAt",
+            "operationId",
+            "causationId",
+            "type",
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

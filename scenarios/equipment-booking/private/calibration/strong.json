@@ -1,0 +1,120 @@
+{
+  "kind": "strong",
+  "synthetic": true,
+  "rubricVersion": "0.2.0",
+  "scenarioId": "equipment-booking",
+  "description": "표준 수행 기회·사후 질문 이후의 가상 평가 사례. 시스템 누락 없음. 실제 앱 실행 증거가 아님.",
+  "inputEvidence": [
+    {
+      "id": "fixture-run",
+      "source": "system",
+      "kind": "command",
+      "content": "POST 정상201; overlap409; adjacent201; otherCancel403; ownCancel204; race [201,409]; database activeCount=1"
+    },
+    {
+      "id": "fixture-user",
+      "source": "user",
+      "kind": "message",
+      "content": "담당자가 말한 핵심 문제를 질문으로 확인했고, 그 답변을 출처와 함께 AI에게 전달했다. 부가 통계보다 핵심 흐름을 우선했다. 첫 오류를 재현한 뒤 경계 처리를 수정해 재검사했다. 선택한 방식의 대안은 복잡한 자동화이며 지금은 운영 비용이 더 커서 미뤘다. 동시 사용이 증가하면 잠금과 부하 조건을 다시 검토한다. 실제 로그로 확인한 범위 밖은 성공으로 주장하지 않는다."
+    },
+    {
+      "id": "inventory",
+      "source": "system",
+      "kind": "condition",
+      "content": "표준 수행 기회와 5개 사후 질문을 제공하고 기록 수집을 완료했다. 기록에 없는 능력에 대해서는 응답하지 않음으로 확정했다. 이 목록은 실행 성공 또는 이해를 증명하지 않는다."
+    }
+  ],
+  "expected": {
+    "TEC-1": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "TEC-2": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "TEC-3": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "TEC-4": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "INT-1": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "INT-2": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "INT-3": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "INT-4": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "COG-1": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "COG-2": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "COG-3": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    },
+    "COG-4": {
+      "status": "rated",
+      "ratingRange": [
+        2,
+        4
+      ]
+    }
+  },
+  "checks": [
+    "최종 12개 항목은 모두 0~4점이다.",
+    "표준 기회 이후 입증하지 못한 항목은 0점이다.",
+    "AI의 주장과 실제 관찰, 사용자의 직접 설명을 구분한다.",
+    "시스템 누락·환경 오류는 성적이 아니라 채점 전 복구 대상이다."
+  ],
+  "scoringPolicyVersion": "1.0.0"
+}
