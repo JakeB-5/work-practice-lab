@@ -49,3 +49,24 @@ h1,h2,h3{word-break:keep-all}
 [data-theme=dark] .score-card{background:#1a2520}[data-theme=dark] .score-card.total{background:#284b35}.generator-form{margin-top:28px}.generator-options{display:grid;grid-template-columns:1fr 2fr;gap:20px}.generation-progress{margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}.generation-progress p{flex-basis:100%;margin:0;color:var(--muted)}.generated-result{border-color:var(--green)}@media(max-width:600px){.generator-options{grid-template-columns:1fr}.section-title{gap:12px;flex-wrap:wrap}}
 
 .event-list .activity-help{font:11px/1.7 sans-serif;color:#a2b3a4;margin:0 0 12px}.event-list small{overflow-wrap:anywhere}
+
+/* Size the output with its panel; xterm keeps its own scrollback viewport. */
+.center-panel>:is(.editor-container,.preview){min-height:140px}
+.center-panel>.panel-layout{flex-shrink:0}
+.terminal-resizer{height:16px;flex:0 0 16px;display:flex;align-items:center;justify-content:center;cursor:row-resize;touch-action:none;user-select:none;background:#26382e;color:#b9cbbc;border-top:1px solid #4b6654;border-bottom:1px solid #30483a;font-size:9px;letter-spacing:.2px}
+.terminal-resizer:hover,.terminal-resizer:focus-visible{background:#35513e;color:#fff;outline:2px solid #9cdbb6;outline-offset:-2px}
+.bottom-panel{display:flex;flex-direction:column;min-height:160px}
+.bottom-panel>.tabs{flex-shrink:0}
+.tabs .panel-expand{margin-left:auto;white-space:nowrap}
+.terminal-wrap{height:auto;flex:1;min-height:0;display:flex;flex-direction:column}
+.terminal-controls{flex-shrink:0;min-height:28px;height:auto;flex-wrap:wrap;padding-bottom:4px}
+.terminal-host{height:auto;flex:1;min-height:0}
+.bottom-panel>.event-list{height:auto;flex:1;min-height:0}
+.center-panel.terminal-expanded>:not(.bottom-panel){display:none}
+.center-panel.terminal-expanded>.bottom-panel{flex:1}
+@media(max-width:1000px){.workbench>.center-panel{height:max(700px,calc(100dvh - 190px));min-height:0}}
+
+/* Hidden/overlay sidebars must not shift the remaining grid items into column 1. */
+.workbench>.left-panel{grid-column:1;grid-row:1}
+.workbench>.center-panel{grid-column:2;grid-row:1}
+.workbench>.chat-panel{grid-column:3;grid-row:1}
