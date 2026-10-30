@@ -95,3 +95,11 @@ h1,h2,h3{word-break:keep-all}
 [data-theme=dark] .workbench.overlay-left:not(.hide-left)>.left-panel{background:#1a2520}
 .terminal-resizer{height:6px;flex-basis:6px;position:relative}.terminal-resizer span{display:none}.terminal-resizer::after{content:'';width:34px;height:2px;background:#718c79;border-radius:2px}
 @media(max-width:600px){.header-right{font-size:0;gap:5px}.header-right .local-dot{display:none}.brand{font-size:11px}.work-header{padding:4px 8px}.work-header strong{max-width:150px}.work-header>div:last-child{gap:4px}.work-header .connection,.work-header .badge{display:none}.work-header button{padding:4px 6px}#root:has(.workbench){height:auto;min-height:100dvh}.workbench,.workbench.hide-left{display:flex;flex-direction:column;min-height:0}.workbench>.center-panel{height:calc(100dvh - 106px);min-height:400px;flex-shrink:0}.workbench>.chat-panel{height:550px;flex-shrink:0}.workbench>.chat-resizer{display:none}}
+
+/* Monaco relayout is asynchronous during a drag: clip stale canvas dimensions
+   and keep its positioned widgets inside the editor's stacking context. */
+.center-panel>.editor-container{position:relative;isolation:isolate;overflow:hidden}
+.editor-container>section{min-height:0;min-width:0}
+.editor-container>.file-caption{flex-shrink:0}
+.center-panel>.bottom-panel{position:relative;z-index:1;background:#192522}
+.bottom-panel>.tabs{position:relative;z-index:1;background:#192522}
