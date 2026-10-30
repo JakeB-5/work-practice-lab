@@ -1,6 +1,6 @@
 {
   "name": "work-practice-lab",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "packageManager": "pnpm@12.9.1",
@@ -18,7 +18,9 @@
     "test:e2e": "tsx tools/e2e.ts",
     "test:live": "tsx tools/runtime-probe/live.ts",
     "tasks": "tsx tools/task-status.ts",
-    "postinstall": "node tools/postinstall.mjs"
+    "postinstall": "node tools/postinstall.mjs",
+    "lab": "tsx tools/agent-cli.ts",
+    "setup": "node tools/setup.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",

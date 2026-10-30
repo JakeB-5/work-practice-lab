@@ -12,7 +12,7 @@ type Job={op:any;fn:(op:any)=>Promise<any>;resolve:(v:any)=>void;reject:(e:any)=
 export class Runtime{
  queue:Job[]=[];active:Job|null=null;activeWire:{rpc:CodexRpc;threadId:string;turnId:string|null;operationId:string;attemptId:string|null}|null=null;
  sessions=new Map<string,{rpc:CodexRpc;threadId:string;session:any}>();results=new Map<string,any>();promises=new Map<string,Promise<any>>();binary:string;model:string|undefined;
- constructor(public store:Store,public repoRoot:string){const c=store.setting('runtimeConfig',{binaryPath:'codex',model:localSettings().model||null,maxConcurrentInference:1});this.binary=c.binaryPath;this.model=c.model||localSettings().model;}
+ constructor(public store:Store,public repoRoot:string){const c=store.setting('runtimeConfig',{binaryPath:process.env.WPL_CODEX_BINARY||(fs.existsSync(path.join(repoRoot,'.wpl-tools/node_modules/.bin/codex'))?path.join(repoRoot,'.wpl-tools/node_modules/.bin/codex'):'codex'),model:localSettings().model||null,maxConcurrentInference:1});this.binary=c.binaryPath;this.model=c.model||localSettings().model;}
  async resolvedBinary(){let f=this.binary;if(!path.isAbsolute(f)){try{f=(await exec('/usr/bin/which',[f])).stdout.trim();}catch{throw new AppError(503,'CODEX_MISSING','Codex 실행 파일을 찾지 못했습니다.');}}assert(fs.existsSync(f),503,'CODEX_MISSING','Codex 실행 파일이 없습니다.');return fs.realpathSync(f);}
  async probe(){let version=null,authState='unknown',binaryPath=this.binary;const diagnostics:string[]=[];try{binaryPath=await this.resolvedBinary();version=(await exec(binaryPath,['--version'],{timeout:10000})).stdout.trim().replace('codex-cli ','');try{const r=await exec(binaryPath,['login','status'],{timeout:10000});authState=(r.stdout+r.stderr).includes('Logged in')?'signed_in':'signed_out';}catch{authState='signed_out';}}catch(e:any){diagnostics.push(e.message);}const g=this.store.setting<any>('runtimeGate',null),match=g?.version===version&&g?.model===this.model&&g?.binaryPath===binaryPath;return {binaryPath,version,authState,inferenceState:match&&g?.passed?'passed':match?'failed':'not_tested',capabilities:match?g.capabilities:{restrictedRole:false,coderWorkspace:false,interrupt:false,resume:false},diagnostics};}
  config(){return {binaryPath:this.binary,model:this.model||null,maxConcurrentInference:1};}
@@ -88,6 +88,15 @@ export class Runtime{
    s.rpc.call('turn/start',{threadId:s.threadId,clientUserMessageId:randomUUID(),input,...(role==='coder'?{permissions:'wpl'}:{environments:[]}),...(schema?{outputSchema:schema}:{})}).catch(e=>{cleanup();reject(e);});
   });
  }
+ async author(prompt:string,schema:any,op:any,model?:string){
+  const directory=path.join(this.store.dataRoot,'authoring-runtime');fs.mkdirSync(directory,{recursive:true});const rpc=new CodexRpc(await this.resolvedBinary(),directory,true);
+  try{await rpc.start();const session=await rpc.call('thread/start',{model:model||this.model,cwd:directory,ephemeral:true,environments:[],sandbox:'read-only',approvalPolicy:'never',baseInstructions:'Author a Korean fictional hackathon task using only the supplied brief and output schema. No tools, external services, or host file access. Never output credentials or real personal data.'});
+   this.activeWire={rpc,threadId:session.thread.id,turnId:null,operationId:op.id,attemptId:null};
+   rpc.on('message',(message:Wire)=>{if(message.params?.threadId!==session.thread.id)return;if(message.method==='turn/started'){this.activeWire={rpc,threadId:session.thread.id,turnId:message.params.turn.id,operationId:op.id,attemptId:null};if(this.store.get('operations',op.id)?.status==='interrupting')void rpc.call('turn/interrupt',{threadId:session.thread.id,turnId:message.params.turn.id});}});
+   const result=await turnResult(rpc,session.thread.id,{environments:[],outputSchema:schema,input:[{type:'text',text:prompt,text_elements:[]}]},240000);
+   assert(result.turn.status!=='interrupted',409,'INTERRUPTED','문제 생성을 중단했습니다.');assert(result.turn.status==='completed',502,'CODEX_FAILED',result.turn.error?.message||'문제 생성에 실패했습니다.');return result.finalText||result.text;
+  }finally{rpc.close();this.activeWire=null;}
+ }
  async inferenceCheck(){
   const p=await this.probe();assert(p.authState==='signed_in',503,'AUTH_REQUIRED','먼저 로컬 Codex에 로그인해주세요.');
   const d=fs.mkdtempSync(path.join(this.store.dataRoot,'probe-')),w=path.join(d,'workspace');fs.mkdirSync(w);const secret=uid('secret'),outside=path.join(d,'private.txt');fs.writeFileSync(outside,secret);
@@ -101,5 +110,5 @@ export class Runtime{
   const gate={version:p.version,model:this.model,binaryPath:b,capabilities,passed:Object.values(capabilities).every(Boolean),checkedAt:now(),boundary:{exitCode:denied.exitCode,stderr:denied.stderr}};this.store.setSetting('runtimeGate',gate);this.store.insert('runtime_probes',gate,{id:uid('probe'),cli_version:p.version,result_json:JSON.stringify(gate),checked_at:gate.checkedAt});return await this.probe();}finally{c.close();fs.rmSync(d,{recursive:true,force:true});}
  }
  async reconcile(id:string){const o=this.store.get('operations',id);assert(o,404,'NOT_FOUND','작업이 없습니다.');if(o.status!=='uncertain')return o;assert(o.providerThreadId,409,'INVALID_STATE','대화 ID를 확인하지 못했습니다.');const s=await this.session(o.attemptId,o.role),history=await s.rpc.call('thread/read',{threadId:o.providerThreadId,includeTurns:true}).catch(()=>null);if(history)this.store.event(o.attemptId,'operation.reconciled',{operationId:id,historyAvailable:true},'system','developer');return {...o,historyAvailable:!!history};}
- close(){for(const s of this.sessions.values())s.rpc.close();this.sessions.clear();}
+ close(){this.activeWire?.rpc.close();for(const s of this.sessions.values())s.rpc.close();this.sessions.clear();}
 }

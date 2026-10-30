@@ -106,7 +106,7 @@ export class Agents{
   const job=this.runtime.enqueue('scenario.inference',a.id,'scenario_app',async op=>{
    if(a.executionMode==='replay')return {output:'[재생] 실제 AI 호출을 수행하지 않았습니다.',outputJson:null};
    const old=this.runtime.sessions.get(a.id+':scenario_app');if(old){old.rpc.close();this.runtime.sessions.delete(a.id+':scenario_app');}
-   const result=await this.runtime.raw(a.id,'scenario_app',JSON.stringify({purpose:'Respond for this practice application. Use only provided public resources. Clearly identify unsupported product facts.',resources:input.resourceIds.map((x:string)=>this.scenarios.resource(s.id,x)),conversation:input.messages}),input.outputSchema||null,op);
+   const result=await this.runtime.raw(a.id,'scenario_app',JSON.stringify({purpose:'Respond for this practice application. Use only provided public resources. Clearly identify unsupported domain facts.',resources:input.resourceIds.map((x:string)=>this.scenarios.resource(s.id,x)),conversation:input.messages}),input.outputSchema||null,op);
    return {output:result,outputJson:input.outputSchema?finalJson(result):null};
   });this.store.setSetting('appOperation:'+job.operationId,hash(token));return {operationId:job.operationId};
  }

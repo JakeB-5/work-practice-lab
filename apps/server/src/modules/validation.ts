@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import {runBrowserJourney} from './browser-journey.ts';
 import {checkDefinitions} from './check-definitions.ts';
 import path from 'node:path';
 import {chromium} from '@playwright/test';
@@ -39,6 +40,11 @@ export class Validation{
  }
  async browserFlow(id:string,run:any,url:string,signal?:AbortSignal){
   signal?.throwIfAborted();const browser=await chromium.launch({headless:true});const abort=()=>{void browser.close();};signal?.addEventListener('abort',abort,{once:true});try{signal?.throwIfAborted();const page=await browser.newPage({viewport:{width:1280,height:900}});const errors:string[]=[];page.on('pageerror',e=>errors.push(e.message));const response=await page.goto(url,{waitUntil:'networkidle',timeout:30000});const text=(await page.locator('body').innerText()).slice(0,16000);const shot=await page.screenshot({fullPage:true});const e=this.evidence(id,run.submissionId,'browser_capture','system',{kind:'capture',validationRunId:run.id,captureId:uid('cap')},shot,'image/png');const observation=this.evidence(id,run.submissionId,'command','system',{kind:'validation',validationRunId:run.id},JSON.stringify({url,status:response?.status(),bodyText:text,errors}));return {status:(response?.status()||500)<400&&!errors.length?'passed':'failed',evidenceIds:[e.id,observation.id],detail:'첫 화면 실행 확인. 전체 교육 효과나 대화 품질의 자동 통과를 뜻하지 않습니다.'};}finally{signal?.removeEventListener('abort',abort);await browser.close();}
+ }
+ async journey(id:string,run:any,url:string,steps:any[],signal?:AbortSignal){
+  const result=await runBrowserJourney(url,steps,signal),evidenceIds=[this.evidence(id,run.submissionId,'command','system',{kind:'validation',validationRunId:run.id},JSON.stringify(result.observations)).id];
+  if(result.screenshot)evidenceIds.push(this.evidence(id,run.submissionId,'browser_capture','system',{kind:'capture',validationRunId:run.id,captureId:uid('cap')},result.screenshot,'image/png').id);
+  return {status:result.status,evidenceIds,detail:result.status==='passed'?'정의된 입력·조작·결과 확인을 실제 화면에서 수행했습니다.':'실제 화면에서 기대 결과와 다른 단계가 있습니다. 검사 기록을 확인하세요.'};
  }
  async retailFlow(id:string,run:any,url:string,signal?:AbortSignal){
   const observations:any[]=[];const request=async(action:string,text='',history:any[]=[])=>{const r=await fetch(url+'/api/practice',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,text,history}),signal:AbortSignal.any([AbortSignal.timeout(120000),...(signal?[signal]:[])])});const value=await r.text();let body:any;try{body=JSON.parse(value);}catch{body={text:value.slice(0,2000)};}const item={action,status:r.status,body};observations.push(item);return item;};
@@ -117,7 +123,7 @@ export class Validation{
       if(this.store.consumeFault(sub.attemptId,'timeout'))throw Object.assign(new Error('개발 모드 검사 시간 초과 재현'),{name:'TimeoutError'});
       let screen:any={status:'passed',evidenceIds:[]},result:any;
       if(check.runner==='command')result=await this.commandCheck(sub,run,check,root,scenario,signal);
-      else{preview=await this.workspace.startPreview(sub.attemptId,root,'validation:'+id,signal);screen=await this.browserFlow(sub.attemptId,run,preview.url,signal);result=check.runner==='browser-page'?screen:check.runner==='retail-flow'?await this.retailFlow(sub.attemptId,run,preview.url,signal):await this.bookingFlow(sub.attemptId,run,preview.url,check.runner==='booking-race',signal);}
+      else{preview=await this.workspace.startPreview(sub.attemptId,root,'validation:'+id,signal);screen=await this.browserFlow(sub.attemptId,run,preview.url,signal);result=check.runner==='browser-journey'?await this.journey(sub.attemptId,run,preview.url,check.steps,signal):check.runner==='browser-page'?screen:check.runner==='retail-flow'?await this.retailFlow(sub.attemptId,run,preview.url,signal):await this.bookingFlow(sub.attemptId,run,preview.url,check.runner==='booking-race',signal);}
       run.status=screen.status==='failed'?'failed':result.status;run.evidenceIds=[...new Set([...screen.evidenceIds,...result.evidenceIds])];run.detail=check.description+' · '+(screen.status==='failed'?'첫 화면 실행 실패 · ':'')+result.detail;run.exitCode=run.status==='passed'?0:run.status==='failed'?1:null;
      }catch(e:any){run.status=batch.signal.aborted?'cancelled':controller.signal.aborted||e.name==='TimeoutError'||/timed out|timeout/i.test(e.message)?'timed_out':'error';run.detail=e.message;run.evidenceIds.push(this.evidence(sub.attemptId,submissionId,'command','system',{kind:'validation',validationRunId:id},JSON.stringify({error:e.message,code:e.code})).id);}
      finally{

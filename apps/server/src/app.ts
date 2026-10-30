@@ -8,6 +8,8 @@ import {WebSocketServer} from 'ws';
 import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import {Store,AppError,assert,hash,uid,now} from './core.ts';
+import {applicationBuildId} from './build-id.ts';
+import {ScenarioDrafts,validateDraft} from './modules/scenario-drafts.ts';
 import {Scenarios} from './modules/scenarios.ts';
 import {Workspace} from './modules/workspace.ts';
 import {Runtime} from './modules/runtime.ts';
@@ -18,11 +20,12 @@ import {Validation} from './modules/validation.ts';
 import {Imports} from './modules/imports.ts';
 import {Evaluation} from './modules/evaluation.ts';
 export async function createApp(options:{repoRoot:string;dataRoot:string;port?:number;dev?:boolean}){
- const {repoRoot,dataRoot}=options,store=new Store(dataRoot,path.join(repoRoot,'packages/contracts/storage.sql'));
+ const {repoRoot,dataRoot}=options,buildId=applicationBuildId(repoRoot),store=new Store(dataRoot,path.join(repoRoot,'packages/contracts/storage.sql'));
  const scenarios=new Scenarios(store,path.join(repoRoot,'scenarios'));scenarios.loadAll();
  const workspace=new Workspace(store,scenarios,repoRoot),runtime=new Runtime(store,repoRoot),attempts=new Attempts(store,scenarios,workspace,runtime);
  let origin='http://127.0.0.1:'+(options.port||4310);
  const agents=new Agents(store,scenarios,runtime,workspace,()=>origin),submissions=new Submissions(store,workspace,runtime,attempts,agents),validation=new Validation(store,workspace,submissions,attempts,scenarios),evaluation=new Evaluation(store,runtime,scenarios,submissions,validation,attempts,repoRoot);
+ const scenarioDrafts=new ScenarioDrafts(scenarios,runtime);
  const imports=new Imports(store,()=>runtime.close());
  workspace.isCoderBusy=id=>runtime.isCoderBusy(id);await workspace.recoverOwnedProcesses();attempts.recover();attempts.runClock();
  const app=express(),server=http.createServer(app),wss=new WebSocketServer({noServer:true});
@@ -41,6 +44,10 @@ export async function createApp(options:{repoRoot:string;dataRoot:string;port?:n
  bootstrap:(r,s)=>{assert(tokens.delete(r.body.launchToken),401,'AUTH_REQUIRED','시작 연결이 만료됐습니다. 페이지를 새로 열어주세요.');const session=sessions.has(r.cookies[sessionCookie()])?r.cookies[sessionCookie()]:uid('auth'),csrf=sessions.get(session)||randomBytes(32).toString('hex');sessions.set(session,csrf);s.cookie(sessionCookie(),session,{httpOnly:true,sameSite:'strict',path:'/'});return {csrfToken:csrf,expiresAt:new Date(Date.now()+86400000).toISOString()};},
  runtimeProbe:()=>runtime.probe(),runtimeConfig:()=>runtime.config(),runtimeModels:()=>runtime.models(),updateRuntimeConfig:r=>runtime.configure(r.body),
  inferenceCheck:()=>{const j=runtime.enqueue('runtime.check',null,null,()=>runtime.inferenceCheck());return {operationId:j.operationId};},
+ agentInfo:()=>({application:'work-practice-lab',version:'0.3.0',processId:process.pid,buildId,activeWork:!!runtime.active||runtime.queue.length>0||!!store.all('attempts',"state NOT IN ('completed','abandoned')").length,instanceId:hash(fs.realpathSync(repoRoot)+'\0'+fs.realpathSync(dataRoot)),capabilities:['scenario.generate','scenario.validate','scenario.import','theme']}),
+ generateScenario:r=>{const job=scenarioDrafts.generate(r.body);return {operationId:job.operationId};},
+ importScenario:r=>scenarioDrafts.import(r.body),
+ validateScenario:r=>{scenarioDrafts.available();validateDraft(r.body);return {valid:true,title:r.body.title,workflowCount:r.body.workflows.length};},
  listScenarios:()=>list(scenarios.list()),getScenario:r=>scenarios.publicDto(scenarios.get(r.params.scenarioVersionId)),getScenarioResource:r=>scenarios.resource(r.params.scenarioVersionId,String(r.query.resourceId)),
  listAttempts:()=>attempts.list(),createAttempt:r=>attempts.createChecked(r.body),getAttempt:r=>attempts.dto(store.requireAttempt(r.params.attemptId)),deleteAttempt:async r=>{await attempts.remove(r.params.attemptId);return {deleted:true};},
  prepareAttempt:r=>attempts.prepare(r.params.attemptId,r.body.version),startAttempt:r=>attempts.start(r.params.attemptId,r.body.version),pauseAttempt:r=>attempts.pause(r.params.attemptId,r.body.version),resumeAttempt:r=>attempts.resume(r.params.attemptId,r.body.version),abandonAttempt:r=>attempts.abandon(r.params.attemptId,r.body.version),forkAttempt:r=>attempts.fork(r.params.attemptId,r.body.mode),
@@ -101,5 +108,5 @@ export async function createApp(options:{repoRoot:string;dataRoot:string;port?:n
  if(options.dev){const {createServer}=await import('vite');vite=await createServer({root:repoRoot,server:{middlewareMode:true,watch:{ignored:[dataRoot+'/**','**/.wpl-data/**','**/scenarios/**','**/docs/**','**/tests/**','**/dist/**']}},appType:'custom'});app.use(vite.middlewares);}else app.use('/assets',express.static(path.join(repoRoot,'dist/assets'),{immutable:true,maxAge:'1y'}));
  app.get('/{*path}',async(r,s,next)=>{try{const file=path.join(repoRoot,options.dev?'index.html':'dist/index.html');let html=fs.readFileSync(file,'utf8').replace('__WPL_BOOTSTRAP__',issueLaunch());if(vite)html=await vite.transformIndexHtml(r.originalUrl,html);s.type('html').send(html);}catch(e){next(e);}});
  app.use((e:any,_r:any,s:any,_next:any)=>{if(s.headersSent)return s.end();s.status(e.status||500).json({error:{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'요청을 처리하지 못했습니다.',retryable:!!e.retryable,requestId:uid('req'),...(e.details?{details:e.details}:{})}});if(!e.status)console.error(e);});
- return {app,server,store,scenarios,workspace,runtime,attempts,agents,submissions,validation,evaluation,imports,issueLaunch,listen:async(port=options.port||4310)=>{await new Promise<void>(resolve=>server.listen(port,'127.0.0.1',resolve));origin='http://127.0.0.1:'+(server.address() as any).port;return origin;},close:async()=>{attempts.close();runtime.close();await workspace.close();for(const s of streams)s.end();wss.clients.forEach(w=>w.terminate());wss.close();await vite?.close();await new Promise<void>(resolve=>server.close(()=>resolve()));store.close();}};
+ return {app,server,store,scenarios,workspace,runtime,attempts,agents,submissions,validation,evaluation,imports,scenarioDrafts,issueLaunch,listen:async(port=options.port||4310)=>{await new Promise<void>(resolve=>server.listen(port,'127.0.0.1',resolve));origin='http://127.0.0.1:'+(server.address() as any).port;return origin;},close:async()=>{attempts.close();runtime.close();await workspace.close();for(const s of streams)s.end();wss.clients.forEach(w=>w.terminate());wss.close();await vite?.close();await new Promise<void>(resolve=>server.close(()=>resolve()));store.close();}};
 }

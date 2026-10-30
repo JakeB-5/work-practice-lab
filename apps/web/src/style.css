@@ -13,3 +13,37 @@ h1,h2,h3{word-break:keep-all}
 .editor-toolbar{height:auto;min-height:45px;flex-wrap:wrap;padding-top:4px;padding-bottom:4px}.editor-toolbar .button{padding:5px 8px;font-size:10px}.preview-help{flex-shrink:0;margin:0;padding:5px 12px;font-size:11px;color:#526759;background:#eef2ea}
 
 .model-policy{border:1px solid var(--line,#ddd);border-radius:12px;padding:18px;margin:20px 0;min-width:0}.model-policy legend{font-weight:700;padding:0 6px}.model-policy .checkbox{margin:12px 0;align-items:flex-start}.model-id{display:block;color:#686c70;font-size:11px;overflow-wrap:anywhere;margin:3px 0 8px}.model-choice{margin:18px 0}.model-choice select{max-width:100%}.model-policy p,.model-choice p{overflow-wrap:anywhere}
+
+:root{color-scheme:light}
+.theme-choice{display:flex;align-items:center;gap:6px;font-size:11px;white-space:nowrap}.theme-choice select{width:auto;padding:6px 8px;font-size:11px}.theme-choice span{font-size:0}.theme-choice select:focus-visible{outline-offset:1px}
+:root[data-theme=dark]{color-scheme:dark;color:#e1e9e4;background:#111917;--green:#88d4ad;--line:#34453d;--muted:#a6b7ad}
+[data-theme=dark] :is(button,.button,input,textarea,select,.panel,.scenario-card,.history-list,.work-header,.workbench,.composer,.modal){background:#1a2520;color:#e1e9e4}
+[data-theme=dark] :is(button:hover,.button:hover){background:#2a3d32;border-color:#637f6c}
+[data-theme=dark] :is(button.primary,.button.primary,.composer .send){background:#347657;color:#fff;border-color:#347657}
+[data-theme=dark] :is(button.primary:hover,.button.primary:hover){background:#3e8967}
+[data-theme=dark] :is(button.subtle,.icon-button,.brand,.back,.tabs button,.card-link,.resource-list button,.file-list button,.share-button,.editor-toolbar .tab,.file-caption button,.developer>button){background:transparent}
+[data-theme=dark] .global-header{background:#151f1a}
+[data-theme=dark] :is(pre,.file-caption,.panel-layout,.preview-help,.queue,.message.user,.modal blockquote){background:#223129;color:#d1dfd5}
+[data-theme=dark] :is(.scenario-visual,.big-icon,.avatar){background:#2a4032;color:#add8b9}
+[data-theme=dark] :is(.scenario-visual.v1,.avatar.coder){background:#3c392c;color:#d7cfab}
+[data-theme=dark] :is(.resume-card,.next-actions){background:#233c2d;border-color:#395b43;color:#d3e6d7}
+[data-theme=dark] .empty{background:#18251d;border-color:#405a46;color:#a9c3ae}
+[data-theme=dark] :is(.badge,.evidence-link){background:#283a2c;border-color:#425b48;color:#c2dac7}
+[data-theme=dark] .badge.green{background:#254532;border-color:#3c634a;color:#b7e0c4}
+[data-theme=dark] :is(.notice,.approval,.condition-strip,.developer,.conflict,.limitation,.badge.amber){background:#3b3222;color:#e1c78d;border-color:#625237}
+[data-theme=dark] .error-banner{background:#462c27;color:#ffd1b5}
+[data-theme=dark] :is(.subtitle,.journey,.card-content p,.resume-card p,.material,.editor-empty,.editor-empty h3,.chat-empty,.model-id,details summary,.empty h3,footer,.file-caption,.save-state,.message-meta span){color:#a9bcb0}
+[data-theme=dark] :is(.eyebrow,.card-link,.tabs button.active,.editor-toolbar .tab.active,.share-button){color:#9cdbb6}
+[data-theme=dark] :is(.tabs button.active,.card-link,.chat-intro,.composer){border-color:#3f5d49}
+[data-theme=dark] :is(.resource-list button.selected,.file-list button.selected){background:#2a4634;color:#c2efd2}
+[data-theme=dark] .preview{background:#101713}
+[data-theme=dark] .score-card.total{background:#284b35;color:#eff8ed}
+[data-theme=dark] .score-card.total :is(span,small){color:#c0d5be}
+[data-theme=dark] .timer.urgent{color:#f4bb85}
+[data-theme=dark] .workbench:not(.hide-left) .left-panel{background:#1a2520}
+[data-theme=dark] .private-heading{color:#e1c78d}
+[data-theme=dark] .tabs.dark button{background:transparent;color:#b8c9bb}
+[data-theme=dark] .tabs.dark button.active{color:#e1efe3;border-bottom-color:#9cdbb6}
+@media(max-width:600px){.header-right{gap:6px}.theme-choice select{max-width:82px}.global-header{gap:8px;padding:0 12px}}
+
+[data-theme=dark] .score-card{background:#1a2520}[data-theme=dark] .score-card.total{background:#284b35}.generator-form{margin-top:28px}.generator-options{display:grid;grid-template-columns:1fr 2fr;gap:20px}.generation-progress{margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}.generation-progress p{flex-basis:100%;margin:0;color:var(--muted)}.generated-result{border-color:var(--green)}@media(max-width:600px){.generator-options{grid-template-columns:1fr}.section-title{gap:12px;flex-wrap:wrap}}

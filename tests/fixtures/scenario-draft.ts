@@ -1,0 +1,8 @@
+export function practiceDraft(){
+ const ids=['TEC','INT','COG'].flatMap(prefix=>[1,2,3,4].map(n=>prefix+'-'+n));
+ return {schemaVersion:'1',scenarioId:'club-signup',version:'0.1.0',title:'동아리 행사 신청',summary:'정원과 이름을 확인하고 신청을 관리합니다.',brief:'# 동아리 행사 신청\n신청을 받고 명단을 확인할 웹 앱을 만드세요. 세부 규칙은 담당자에게 질문하세요.',durationMinutes:60,allowedModels:null,
+ resources:[{id:'events',title:'가상 행사',content:'종이 공예 체험: 정원 2명. 모든 참가자는 가상 인물입니다.'}],
+ stakeholder:{persona:{name:'민서',job:'행사 담당자',tone:'필요한 업무 사실만 설명한다.'},topics:[{id:'problem',label:'문제',description:'명단 관리의 어려움'},{id:'goal',label:'목표',description:'신청과 명단 확인'},{id:'scope',label:'범위',description:'이름 검증과 정원'}],facts:[{id:'current-problem',topicIds:['problem'],statement:'메신저 신청을 수기로 합쳐 누락이 있습니다.',sourceResourceIds:[]},{id:'success-goal',topicIds:['goal'],statement:'신청 이름을 입력하고 명단에서 확인할 수 있어야 합니다.',sourceResourceIds:[]},{id:'required-name',topicIds:['scope'],statement:'빈 이름은 거절하고 이름을 입력해주세요 라고 안내합니다.',sourceResourceIds:[]},{id:'capacity-rule',topicIds:['scope'],statement:'정원은 2명이며 초과 접수하지 않습니다.',sourceResourceIds:['events']} ]},
+ rubricTargets:Object.fromEntries(ids.map(id=>[id,id+' 영역에서 실제 사용자 판단과 구현 근거를 확인합니다.'])),
+ workflows:[{id:'register-person',description:'신청 후 이름 확인',requirementIds:['success-goal'],steps:[{action:'open',target:'/',value:''},{action:'fill',target:'[data-testid="name"]',value:'가상 참가자'},{action:'click',target:'[data-testid="submit"]',value:''},{action:'expectText',target:'[data-testid="list"]',value:'가상 참가자'}]},{id:'empty-name',description:'빈 이름 거절',requirementIds:['required-name'],steps:[{action:'open',target:'/',value:''},{action:'click',target:'[data-testid="submit"]',value:''},{action:'expectText',target:'[data-testid="error"]',value:'이름을 입력해주세요'}]}]};
+}

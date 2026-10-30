@@ -7621,6 +7621,904 @@
           }
         }
       }
+    },
+    "/agent": {
+      "get": {
+        "operationId": "agentInfo",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "State conflict"
+          },
+          "422": {
+            "description": "Invalid scenario"
+          }
+        }
+      }
+    },
+    "/scenario-drafts/validate": {
+      "post": {
+        "operationId": "validateScenario",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "State conflict"
+          },
+          "422": {
+            "description": "Invalid scenario"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schemaVersion": {
+                    "const": "1"
+                  },
+                  "scenarioId": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                  },
+                  "version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 400
+                  },
+                  "brief": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 12000
+                  },
+                  "durationMinutes": {
+                    "type": "integer",
+                    "minimum": 15,
+                    "maximum": 240
+                  },
+                  "allowedModels": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 100
+                      }
+                    ]
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        },
+                        "content": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 18000
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "maxItems": 8
+                  },
+                  "stakeholder": {
+                    "type": "object",
+                    "properties": {
+                      "persona": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 60
+                          },
+                          "job": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "tone": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 300
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "job",
+                          "tone"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "topics": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                            },
+                            "label": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "description": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 800
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "label",
+                            "description"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 3,
+                        "maxItems": 12
+                      },
+                      "facts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                            },
+                            "topicIds": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                              },
+                              "minItems": 1,
+                              "maxItems": 3
+                            },
+                            "statement": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1400
+                            },
+                            "sourceResourceIds": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 8
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "topicIds",
+                            "statement",
+                            "sourceResourceIds"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 4,
+                        "maxItems": 18
+                      }
+                    },
+                    "required": [
+                      "persona",
+                      "topics",
+                      "facts"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "rubricTargets": {
+                    "type": "object",
+                    "properties": {
+                      "TEC-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      }
+                    },
+                    "required": [
+                      "TEC-1",
+                      "TEC-2",
+                      "TEC-3",
+                      "TEC-4",
+                      "INT-1",
+                      "INT-2",
+                      "INT-3",
+                      "INT-4",
+                      "COG-1",
+                      "COG-2",
+                      "COG-3",
+                      "COG-4"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "workflows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 600
+                        },
+                        "requirementIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                          },
+                          "minItems": 1,
+                          "maxItems": 8
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "action": {
+                                "type": "string",
+                                "enum": [
+                                  "open",
+                                  "fill",
+                                  "click",
+                                  "select",
+                                  "expectText",
+                                  "expectVisible",
+                                  "expectCount"
+                                ]
+                              },
+                              "target": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 300
+                              },
+                              "value": {
+                                "type": "string",
+                                "maxLength": 2000
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "target",
+                              "value"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "minItems": 3,
+                          "maxItems": 18
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "description",
+                        "requirementIds",
+                        "steps"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 2,
+                    "maxItems": 5
+                  }
+                },
+                "required": [
+                  "schemaVersion",
+                  "scenarioId",
+                  "version",
+                  "title",
+                  "summary",
+                  "brief",
+                  "durationMinutes",
+                  "allowedModels",
+                  "resources",
+                  "stakeholder",
+                  "rubricTargets",
+                  "workflows"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scenario-drafts/import": {
+      "post": {
+        "operationId": "importScenario",
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioPublic"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "State conflict"
+          },
+          "422": {
+            "description": "Invalid scenario"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "schemaVersion": {
+                    "const": "1"
+                  },
+                  "scenarioId": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                  },
+                  "version": {
+                    "type": "string",
+                    "pattern": "^\\d+\\.\\d+\\.\\d+$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 400
+                  },
+                  "brief": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 12000
+                  },
+                  "durationMinutes": {
+                    "type": "integer",
+                    "minimum": 15,
+                    "maximum": 240
+                  },
+                  "allowedModels": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 100
+                      }
+                    ]
+                  },
+                  "resources": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100
+                        },
+                        "content": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 18000
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "content"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "maxItems": 8
+                  },
+                  "stakeholder": {
+                    "type": "object",
+                    "properties": {
+                      "persona": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 60
+                          },
+                          "job": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100
+                          },
+                          "tone": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 300
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "job",
+                          "tone"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "topics": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                            },
+                            "label": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 80
+                            },
+                            "description": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 800
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "label",
+                            "description"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 3,
+                        "maxItems": 12
+                      },
+                      "facts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                            },
+                            "topicIds": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                              },
+                              "minItems": 1,
+                              "maxItems": 3
+                            },
+                            "statement": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 1400
+                            },
+                            "sourceResourceIds": {
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                              },
+                              "minItems": 0,
+                              "maxItems": 8
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "topicIds",
+                            "statement",
+                            "sourceResourceIds"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "minItems": 4,
+                        "maxItems": 18
+                      }
+                    },
+                    "required": [
+                      "persona",
+                      "topics",
+                      "facts"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "rubricTargets": {
+                    "type": "object",
+                    "properties": {
+                      "TEC-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "TEC-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "INT-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-1": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-2": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-3": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      },
+                      "COG-4": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 1000
+                      }
+                    },
+                    "required": [
+                      "TEC-1",
+                      "TEC-2",
+                      "TEC-3",
+                      "TEC-4",
+                      "INT-1",
+                      "INT-2",
+                      "INT-3",
+                      "INT-4",
+                      "COG-1",
+                      "COG-2",
+                      "COG-3",
+                      "COG-4"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "workflows": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                        },
+                        "description": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 600
+                        },
+                        "requirementIds": {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^[a-z][a-z0-9-]{1,63}$"
+                          },
+                          "minItems": 1,
+                          "maxItems": 8
+                        },
+                        "steps": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "action": {
+                                "type": "string",
+                                "enum": [
+                                  "open",
+                                  "fill",
+                                  "click",
+                                  "select",
+                                  "expectText",
+                                  "expectVisible",
+                                  "expectCount"
+                                ]
+                              },
+                              "target": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 300
+                              },
+                              "value": {
+                                "type": "string",
+                                "maxLength": 2000
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "target",
+                              "value"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "minItems": 3,
+                          "maxItems": 18
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "description",
+                        "requirementIds",
+                        "steps"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 2,
+                    "maxItems": 5
+                  }
+                },
+                "required": [
+                  "schemaVersion",
+                  "scenarioId",
+                  "version",
+                  "title",
+                  "summary",
+                  "brief",
+                  "durationMinutes",
+                  "allowedModels",
+                  "resources",
+                  "stakeholder",
+                  "rubricTargets",
+                  "workflows"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scenario-drafts/generate": {
+      "post": {
+        "operationId": "generateScenario",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationRef"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "409": {
+            "description": "State conflict"
+          },
+          "422": {
+            "description": "Invalid scenario"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "brief": {
+                    "type": "string",
+                    "minLength": 10,
+                    "maxLength": 6000
+                  },
+                  "durationMinutes": {
+                    "type": "integer",
+                    "minimum": 15,
+                    "maximum": 240
+                  },
+                  "model": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                  },
+                  "allowedModels": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,127}$"
+                        },
+                        "minItems": 1,
+                        "maxItems": 100,
+                        "uniqueItems": true
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "brief",
+                  "durationMinutes"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
