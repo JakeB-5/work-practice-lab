@@ -47,3 +47,5 @@ h1,h2,h3{word-break:keep-all}
 @media(max-width:600px){.header-right{gap:6px}.theme-choice select{max-width:82px}.global-header{gap:8px;padding:0 12px}}
 
 [data-theme=dark] .score-card{background:#1a2520}[data-theme=dark] .score-card.total{background:#284b35}.generator-form{margin-top:28px}.generator-options{display:grid;grid-template-columns:1fr 2fr;gap:20px}.generation-progress{margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px}.generation-progress p{flex-basis:100%;margin:0;color:var(--muted)}.generated-result{border-color:var(--green)}@media(max-width:600px){.generator-options{grid-template-columns:1fr}.section-title{gap:12px;flex-wrap:wrap}}
+
+.event-list .activity-help{font:11px/1.7 sans-serif;color:#a2b3a4;margin:0 0 12px}.event-list small{overflow-wrap:anywhere}
