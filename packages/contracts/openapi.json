@@ -12129,6 +12129,16 @@
                   },
                   "text": {
                     "type": "string"
+                  },
+                  "cols": {
+                    "type": "integer",
+                    "minimum": 20,
+                    "maximum": 300
+                  },
+                  "rows": {
+                    "type": "integer",
+                    "minimum": 5,
+                    "maximum": 100
                   }
                 },
                 "required": [
